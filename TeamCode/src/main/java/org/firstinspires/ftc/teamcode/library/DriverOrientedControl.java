@@ -47,12 +47,13 @@ public class DriverOrientedControl {
 
     public void run(Gamepad gamepad2, double power){
 
-        driveTurn = -gamepad2.left_stick_x;
+        //might have to make this negative
+        driveTurn = gamepad2.right_stick_x;
         //driveVertical = -gamepad1.right_stick_y;
         //driveHorizontal = gamepad1.right_stick_x;
 
-        gamepadXCoordinate = gamepad2.right_stick_x; //this simply gives our x value relative to the driver
-        gamepadYCoordinate = -gamepad2.right_stick_y; //this simply gives our y vaue relative to the driver
+        gamepadXCoordinate = gamepad2.left_stick_x; //this simply gives our x value relative to the driver
+        gamepadYCoordinate = -gamepad2.left_stick_y; //this simply gives our y vaue relative to the driver
         gamepadHypot = Range.clip(Math.hypot(gamepadXCoordinate, gamepadYCoordinate), 0, 1);
         //finds just how much power to give the robot based on how much x and y given by gamepad
         //range.clip helps us keep our power within positive 1
