@@ -72,14 +72,13 @@ public class Moby {
         driveMotors.add(dBackRight);
 
 
+
+    }
+
+
+    public static void initIMU(){
         imu = new IMU();
-
-
         imu.init(hardwareMap);
-
-
-
-
 
     }
 

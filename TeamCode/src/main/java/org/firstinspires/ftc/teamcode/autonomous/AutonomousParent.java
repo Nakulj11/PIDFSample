@@ -6,6 +6,7 @@ import com.acmerobotics.roadrunner.trajectory.Trajectory;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 
+import org.firstinspires.ftc.teamcode.component.IMU;
 import org.firstinspires.ftc.teamcode.core.Moby;
 import org.firstinspires.ftc.teamcode.drive.OdometryMecanumDrive;
 
@@ -20,6 +21,7 @@ public class  AutonomousParent extends LinearOpMode {
     final double LOW_POWER = 0.5;
     double distance = 0;
     double seconds = 0;
+
     OdometryMecanumDrive drive = new OdometryMecanumDrive(hardwareMap);
 
 
@@ -31,6 +33,8 @@ public class  AutonomousParent extends LinearOpMode {
         telemetry.update();
 
         Moby.init(hardwareMap, false);
+        Moby.initIMU();
+
 
 
         // Send diagnostics to user
