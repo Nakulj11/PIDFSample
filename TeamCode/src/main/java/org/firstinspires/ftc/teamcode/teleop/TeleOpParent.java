@@ -73,17 +73,22 @@ public class TeleOpParent extends LinearOpMode {
         while (opModeIsActive()) {
             if(driverOriented){
                 drive.run(gamepad2, POWER);
-            }else{
-                DriveStyle.driveWithType(Moby.driveMotors, gamepad2, type, POWER);
             }
+            //switch-ability between drive types in case driverOriented malfunctions
+//            else{
+//                DriveStyle.driveWithType(Moby.driveMotors, gamepad2, type, POWER);
+//            }
+//            if(gamepad2.left_bumper){
+//                driverOriented = false;
+//            }
+//
+//            if(gamepad2.right_bumper){
+//                driverOriented = true;
+//            }
 
-
-            if(gamepad2.left_bumper){
-                driverOriented = false;
-            }
-
-            if(gamepad2.right_bumper){
-                driverOriented = true;
+            //re-initializes imu to correct heading if teleop starts at the wrong heading
+            if(gamepad2.dpad_left){
+                Moby.initIMU();
             }
         }
 
