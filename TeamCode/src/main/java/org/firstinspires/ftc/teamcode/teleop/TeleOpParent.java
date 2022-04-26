@@ -23,6 +23,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousParent;
 import org.firstinspires.ftc.teamcode.core.Moby;
+import org.firstinspires.ftc.teamcode.library.DriveStyle;
 import org.firstinspires.ftc.teamcode.library.DriverOrientedControl;
 
 import static org.firstinspires.ftc.robotcore.external.navigation.AngleUnit.DEGREES;
@@ -41,6 +42,12 @@ public class TeleOpParent extends LinearOpMode {
     Acceleration gravity;
 
     DriverOrientedControl drive;
+
+    DriveStyle.DriveType type = DriveStyle.DriveType.MECANUMARCADE;
+
+    final double POWER = 0.6;
+
+    boolean driverOriented = true;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -64,7 +71,20 @@ public class TeleOpParent extends LinearOpMode {
 
 
         while (opModeIsActive()) {
-            drive.run(gamepad2, 0.6);
+            if(driverOriented){
+                drive.run(gamepad2, POWER);
+            }else{
+                DriveStyle.driveWithType(Moby.driveMotors, gamepad2, type, POWER);
+            }
+
+
+            if(gamepad2.left_bumper){
+                driverOriented = false;
+            }
+
+            if(gamepad2.right_bumper){
+                driverOriented = true;
+            }
         }
 
     }
