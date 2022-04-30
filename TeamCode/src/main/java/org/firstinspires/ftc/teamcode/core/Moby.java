@@ -45,8 +45,12 @@ public class Moby {
         // The motors turn counterclockwise looking at them head on for FORWARD; set the right ones to reverse for correct operation
 
 
+
         dFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
         dFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
+//        dFrontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+//        dFrontRight.setDirection(DcMotorSimple.Direction.REVERSE);
 
 //        dBackLeft.setDirection(DcMotorSimple.Direction.REVERSE);
 //        dBackRight.setDirection(DcMotorSimple.Direction.REVERSE);
