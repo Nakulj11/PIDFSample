@@ -56,7 +56,7 @@ import static org.firstinspires.ftc.teamcode.drive.DriveConstants.kV;
 @Config
 public class OdometryMecanumDrive extends MecanumDrive {
     public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(0, 0, 0);
-    public static PIDCoefficients HEADING_PID = new PIDCoefficients(0, 0, 0);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(6.5, 0, 0);
 
     public static double LATERAL_MULTIPLIER = 1;
 
@@ -123,8 +123,9 @@ public class OdometryMecanumDrive extends MecanumDrive {
 
         leftFront = hardwareMap.get(DcMotorEx.class, "lf");
         leftRear = hardwareMap.get(DcMotorEx.class, "lr");
-        rightRear = hardwareMap.get(DcMotorEx.class, "rr");
         rightFront = hardwareMap.get(DcMotorEx.class, "rf");
+        rightRear = hardwareMap.get(DcMotorEx.class, "rr");
+
 
         motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
 
@@ -313,7 +314,7 @@ public class OdometryMecanumDrive extends MecanumDrive {
         // See https://github.com/FIRST-Tech-Challenge/FtcRobotController/issues/251 for details.
 
         //TODO: POSSIBLE PROBLEM
-        return (double) -imu.getAngularVelocity().xRotationRate;
+        return (double) imu.getAngularVelocity().xRotationRate;
     }
 
     public static TrajectoryVelocityConstraint getVelocityConstraint(double maxVel, double maxAngularVel, double trackWidth) {

@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.library;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
 
@@ -60,7 +61,7 @@ public class DriverOrientedControl {
         gamepadDegree = Math.toDegrees(Math.atan2(gamepadYCoordinate, gamepadXCoordinate));
 
         //the inverse tangent of opposite/adjacent gives us our gamepad degree
-        robotDegree = -getAngle();
+        robotDegree = getAngle();
         //gives us the angle our robot is at
         movementDegree = gamepadDegree - robotDegree;
 
