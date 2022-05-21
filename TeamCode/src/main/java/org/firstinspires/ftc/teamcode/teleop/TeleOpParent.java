@@ -72,7 +72,7 @@ public class TeleOpParent extends LinearOpMode {
 
         while (opModeIsActive()) {
             if(driverOriented){
-                drive.run2( gamepad2, POWER);
+                drive.drive2( gamepad2, POWER);
             }
             //switch-ability between drive types in case driverOriented malfunctions
 //            else{

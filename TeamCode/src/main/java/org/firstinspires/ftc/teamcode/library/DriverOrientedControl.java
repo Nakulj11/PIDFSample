@@ -49,7 +49,7 @@ public class DriverOrientedControl {
     }
 
 
-    public void run(Gamepad gamepad2, double movementPower){
+    public void drive(Gamepad gamepad2, double movementPower){
 
         //might have to make this negative
         driveTurn = -gamepad2.right_stick_x;
@@ -88,7 +88,7 @@ public class DriverOrientedControl {
     }
 
     //run but hopefully better
-    public void run2(Gamepad gamepad2, double movementPower){
+    public void drive2(Gamepad gamepad2, double movementPower){
         //gamepad input (range -1 to 1)
         driveTurn = gamepad2.right_stick_x;
         driveX = gamepad2.left_stick_x;
