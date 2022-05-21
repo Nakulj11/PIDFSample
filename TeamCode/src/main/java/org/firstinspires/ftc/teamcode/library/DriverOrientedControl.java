@@ -1,17 +1,13 @@
 package org.firstinspires.ftc.teamcode.library;
 
-import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.Range;
 
-import org.firstinspires.ftc.robotcore.external.navigation.Acceleration;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.core.Moby;
 
 public class DriverOrientedControl {
@@ -25,17 +21,22 @@ public class DriverOrientedControl {
 
 
     double driveTurn;
-
-
-    double gamepadXCoordinate;
-    double gamepadYCoordinate;
-    double gamepadHypot;
-    double gamepadDegree;
-    double robotDegree;
-    double movementDegree;
+    double driveX;
+    double driveY;
+    double gamepadPower;
+    double gamepadTheta;
+    double robotTheta;
+    double theta;
     double gamepadXControl;
     double gamepadYControl;
 
+    double sin;
+    double cos;
+    double maxMovement;
+    double frontLeftPower;
+    double frontRightPower;
+    double backLeftPower;
+    double backRightPower;
 
 
     public DriverOrientedControl(){
@@ -48,28 +49,28 @@ public class DriverOrientedControl {
     }
 
 
-    public void run(Gamepad gamepad2, double power){
+    public void run(Gamepad gamepad2, double movementPower){
 
         //might have to make this negative
         driveTurn = -gamepad2.right_stick_x;
-        //driveVertical = -gamepad1.right_stick_y;
 
 
-        gamepadXCoordinate = gamepad2.left_stick_x; //this simply gives our x value relative to the driver
-        gamepadYCoordinate = -gamepad2.left_stick_y; //this simply gives our y vaue relative to the driver
-        gamepadHypot = Range.clip(Math.hypot(gamepadXCoordinate, gamepadYCoordinate), 0, 1);
-        gamepadDegree = Math.toDegrees(Math.atan2(gamepadYCoordinate, gamepadXCoordinate));
+
+        driveX = gamepad2.left_stick_x;
+        driveY = -gamepad2.left_stick_y;
+        gamepadPower = Range.clip(Math.hypot(driveX, driveY), 0, 1);
+        gamepadTheta = Math.toDegrees(Math.atan2(driveY, driveX));
 
         //the inverse tangent of opposite/adjacent gives us our gamepad degree
-        robotDegree = getAngle();
+        robotTheta = getAngle();
         //gives us the angle our robot is at
-        movementDegree = gamepadDegree - robotDegree;
+        theta = gamepadTheta - robotTheta;
 
 
         //adjust the angle we need to move at by finding needed movement degree based on gamepad and robot angles
-        gamepadXControl = Math.cos(Math.toRadians(movementDegree)) * gamepadHypot;
+        gamepadXControl = Math.cos(Math.toRadians(theta)) * gamepadPower;
         //by finding the adjacent side, we can get our needed x value to power our motors
-        gamepadYControl = Math.sin(Math.toRadians(movementDegree)) * gamepadHypot;
+        gamepadYControl = Math.sin(Math.toRadians(theta)) * gamepadPower;
         //by finding the opposite side, we can get our needed y value to power our motors
 
 
@@ -78,17 +79,61 @@ public class DriverOrientedControl {
 //        frontLeft.setPower(power*(gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl* Math.abs(gamepadXControl) + driveTurn));
 //        backLeft.setPower(power*(gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) - driveTurn));
 
-        frontRight.setPower(power*(gamepadYControl * Math.abs(gamepadYControl)  - gamepadXControl* Math.abs(gamepadXControl)  + driveTurn));
-        backRight.setPower(power*(gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) + driveTurn));
-        frontLeft.setPower(power*(gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl* Math.abs(gamepadXControl) - driveTurn));
-        backLeft.setPower(power*(gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) - driveTurn));
+        frontRight.setPower(movementPower*(gamepadYControl * Math.abs(gamepadYControl)  - gamepadXControl* Math.abs(gamepadXControl)  + driveTurn));
+        backRight.setPower(movementPower*(gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl * Math.abs(gamepadXControl) + driveTurn));
+        frontLeft.setPower(movementPower*(gamepadYControl * Math.abs(gamepadYControl) + gamepadXControl* Math.abs(gamepadXControl) - driveTurn));
+        backLeft.setPower(movementPower*(gamepadYControl * Math.abs(gamepadYControl) - gamepadXControl * Math.abs(gamepadXControl) - driveTurn));
 
+
+    }
+
+    //run but hopefully better
+    public void run2(Gamepad gamepad2, double movementPower){
+        //gamepad input (range -1 to 1)
+        driveTurn = gamepad2.right_stick_x;
+        driveX = gamepad2.left_stick_x;
+        driveY = -gamepad2.left_stick_y;
+
+        //gamepad and robot angles
+        gamepadTheta = Math.toDegrees(Math.atan2(driveY, driveX));
+        robotTheta = getAngle();
+
+        //power of movement hypotenuse
+        gamepadPower = Math.hypot(driveX, driveY);
+
+        //angle of wheels (45 deg for mecanum wheel adjustment)
+        theta = gamepadTheta - robotTheta - 45;
+
+        //sin and cos of robot movement
+        sin = Math.sin(Math.toRadians(theta));
+        cos = Math.cos(Math.toRadians(theta));
+        maxMovement = Math.max(Math.abs(sin), Math.abs(cos));
+
+        //determines powers and scales based on max movement
+        frontLeftPower = (gamepadPower * cos / maxMovement + driveTurn);
+        frontRightPower = (gamepadPower * sin / maxMovement - driveTurn);
+        backLeftPower = (gamepadPower * sin / maxMovement + driveTurn);
+        backRightPower = (gamepadPower * cos / maxMovement - driveTurn);
+
+        //scales if -1> powers >1
+        if(gamepadPower + Math.abs(driveTurn)>1){
+            frontLeftPower /= gamepadPower + driveTurn;
+            frontRightPower /= gamepadPower + driveTurn;
+            backLeftPower /= gamepadPower + driveTurn;
+            backRightPower /= gamepadPower + driveTurn;
+        }
+
+        //sets powers scaled to desired speed
+        frontLeft.setPower(movementPower*frontLeftPower);
+        frontRight.setPower(movementPower*frontRightPower);
+        backLeft.setPower(movementPower*backLeftPower);
+        backRight.setPower(movementPower*backRightPower);
 
     }
 
 
 
-    //allows us to quickly get our z angle
+    //gets angle from imu
     public double getAngle() {
         return imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
     }
