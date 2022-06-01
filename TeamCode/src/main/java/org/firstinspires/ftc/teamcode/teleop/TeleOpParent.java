@@ -22,6 +22,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 import org.firstinspires.ftc.teamcode.autonomous.AutonomousParent;
+import org.firstinspires.ftc.teamcode.component.Arm;
 import org.firstinspires.ftc.teamcode.core.Moby;
 import org.firstinspires.ftc.teamcode.library.DriveStyle;
 import org.firstinspires.ftc.teamcode.library.DriverOrientedControl;
@@ -45,7 +46,8 @@ public class TeleOpParent extends LinearOpMode {
 
     DriveStyle.DriveType type = DriveStyle.DriveType.MECANUMARCADE;
 
-    final double POWER = 0.6;
+
+    public double power = 0.76;
 
     boolean driverOriented = true;
 
@@ -72,7 +74,7 @@ public class TeleOpParent extends LinearOpMode {
 
         while (opModeIsActive()) {
             if(driverOriented){
-                drive.drive2( gamepad2, POWER);
+                drive.drive2( gamepad2, power);
             }
             //switch-ability between drive types in case driverOriented malfunctions
 //            else{
@@ -87,9 +89,116 @@ public class TeleOpParent extends LinearOpMode {
 //            }
 
             //re-initializes imu to correct heading if teleop starts at the wrong heading
-            if(gamepad2.dpad_left){
+            if(gamepad2.right_bumper){
                 Moby.initIMU();
             }
+
+            if (gamepad1.dpad_up|| gamepad2.dpad_up) {
+                Moby.spinner.spin();
+            }else if(gamepad1.dpad_down || gamepad2.dpad_down) {
+                Moby.spinner.reverse();
+            }else {
+                Moby.spinner.stop();
+            }
+
+
+
+            if(Moby.colorSensor.intakeSuccessful()){
+                Moby.light.setPower(0.15);
+            }else{
+                Moby.light.setPower(0);
+            }
+
+
+
+//            Moby.light.setPower(0.15 );
+
+
+
+//
+            telemetry.addData("Distance", Moby.colorSensor.getDistance());
+//            telemetry.addData("Red", Moby.colorSensor.getRed());
+//            telemetry.addData("Green", Moby.colorSensor.getBlue());
+//            telemetry.addData("Blue", Moby.colorSensor.getGreen());
+            telemetry.update();
+
+            //to switch between slow mode, normal mode, and fast mode
+            if(gamepad2.left_stick_button){
+                power = 0.67;
+            }
+
+            if(gamepad2.right_stick_button){
+                power = 0.15;
+            }
+
+
+
+            //garbage if statements
+//            if(gamepad2.dpad_left){
+//                drivetrain2.straighten(90, 0.3);
+//                drivetrain2.move(DriveSensor.Sensor.RIGHT, DriveSensor.ReferenceDirection.TOWARDS, 10, 0.6);
+//            }
+//
+//            if(gamepad2.dpad_right){
+//                drivetrain2.straighten(90, 0.3);
+//                drivetrain2.move(DriveSensor.Sensor.LEFT, DriveSensor.ReferenceDirection.TOWARDS, 10, 0.6);
+//            }
+
+
+            //changes claw position on controller input
+            if(gamepad1.a||gamepad2.a){
+                Moby.arm.moveArmTeleOp(Arm.TurnValueTeleOp.GROUND);
+            }
+
+            if(gamepad1.x||gamepad2.x){
+                Moby.arm.moveArmTeleOp(Arm.TurnValueTeleOp.BOTTOM);
+            }
+
+            if(gamepad1.y||gamepad2.y){
+                Moby.arm.moveArmTeleOp(Arm.TurnValueTeleOp.MID);
+            }
+
+            if(gamepad1.b||gamepad2.b){
+                Moby.arm.moveArmTeleOp(Arm.TurnValueTeleOp.TOP);
+            }
+
+
+            //makes small increments or decrements to claw position
+            if(gamepad1.right_trigger >= 0.1 || gamepad2.right_trigger >= 0.1) {
+                Moby.arm.moveUp();
+            }
+            if(gamepad1.left_trigger >= 0.1 || gamepad2.left_trigger >= 0.1) {
+                Moby.arm.moveDown();
+            }
+
+            if(gamepad1.dpad_left||gamepad2.dpad_left) {
+                Moby.intake.out();
+            }else if(gamepad1.dpad_right||gamepad2.dpad_right){
+                Moby.intake.in();
+            }else{
+                Moby.intake.stopSpinner();
+            }
+
+
+            if(gamepad1.left_bumper||gamepad2.left_bumper){
+                Moby.intake.out(1);
+            }
+
+//            if(gamepad1.right_bumper||gamepad2.right_bumper){
+//                Moby.arm.moveArmTeleOp(Arm.TurnValueTeleOp.SHARED);
+//            }
+
+//            telemetry.addData("Position", Moby.intake.getPosition());
+//            telemetry.update();
+
+
+
+            //to stop mover once it has reached its target position
+            if(!Moby.arm.isBusy()){
+                Moby.arm.stopArm();
+            }
+
+
         }
 
     }

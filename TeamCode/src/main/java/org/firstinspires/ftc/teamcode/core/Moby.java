@@ -25,6 +25,14 @@ public class Moby {
     public static IMU imu;
 
 
+    public static SensorColor colorSensor;
+
+    public static Spinner spinner;
+
+    public static IntakeAlternate intake;
+
+    public static Arm arm;
+
     public static DcMotor light;
 
 
@@ -75,6 +83,32 @@ public class Moby {
         driveMotors.add(dBackLeft);
         driveMotors.add(dFrontRight);
         driveMotors.add(dBackRight);
+
+        spinner = new Spinner();
+        intake = new IntakeAlternate();
+        imu = new IMU();
+        colorSensor = new SensorColor();
+        arm = new Arm();
+
+
+        light = hardwareMap.get(DcMotor.class, "light");
+
+        spinner.init(hardwareMap);
+
+        colorSensor.init(hardwareMap);
+
+        intake.init(hardwareMap);
+
+        imu.init(hardwareMap);
+
+
+        if(initTeleOp){
+            arm.init(hardwareMap, true);
+        }else{
+            arm.init(hardwareMap);
+        }
+
+
 
 
 
