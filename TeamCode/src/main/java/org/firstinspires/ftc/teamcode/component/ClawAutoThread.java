@@ -3,6 +3,8 @@ package org.firstinspires.ftc.teamcode.component;
 import org.firstinspires.ftc.teamcode.component.Arm;
 import org.firstinspires.ftc.teamcode.core.Moby;
 
+import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.telemetry;
+
 public class ClawAutoThread extends Thread{
 
     private Level position;
@@ -15,6 +17,8 @@ public class ClawAutoThread extends Thread{
     public void run(){
         switch (position) {
             case TOP:
+                telemetry.addData("Top", 0);
+                telemetry.update();
                 for(int i=0;i<1;i++){
                     Moby.arm.moveArm(Arm.TurnValueAuto.TOP);
                     while(Moby.arm.isBusy()){
