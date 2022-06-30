@@ -27,8 +27,8 @@ public class OutreachAuto extends LinearOpMode {
         IDLE
     }
 
-    final double KP = 0.001;
-    final double KI = 0.0001;
+    final double KP = 0.004;
+    final double KI = 0.0004;
     double integralSum=0;
 
     State currentState = State.IDLE;
