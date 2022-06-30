@@ -5,11 +5,14 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 public class Arm {
 
     //spinner
     private DcMotor arm;
+
+    private ElapsedTime time;
 
     public enum TurnValueAuto{
         GROUND(0),
@@ -75,6 +78,14 @@ public class Arm {
         return arm.getCurrentPosition();
     }
 
+    public int getTargetPosition(){
+        return arm.getTargetPosition();
+    }
+
+    public void setPower(double power){
+        arm.setPower(power);
+    }
+
     //takes in input location
     public void moveArm(TurnValueAuto location){
         int multiplier = 1;//positive if the claw needs to go up, negative if it needs to go down
@@ -88,12 +99,21 @@ public class Arm {
         //sets power and mode
         arm.setPower(multiplier * 0.92);
         arm.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        time = new ElapsedTime();
 
         //garbage way to determine when to stop mover
 //        while(mover.isBusy()){
 //
 //        }
 //        stopMover();
+    }
+
+    public double getTime(){
+        return time.seconds();
+    }
+
+    public void reset(){
+        time.reset();
     }
 
     //takes in input location

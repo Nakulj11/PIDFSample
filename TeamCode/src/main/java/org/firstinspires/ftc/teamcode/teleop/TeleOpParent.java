@@ -124,7 +124,7 @@ public class TeleOpParent extends LinearOpMode {
 
             //to switch between slow mode, normal mode, and fast mode
             if(gamepad2.left_stick_button){
-                power = 0.67;
+                power = 0.88;
             }
 
             if(gamepad2.right_stick_button){

@@ -28,6 +28,9 @@ public class OutreachAuto extends LinearOpMode {
 
     State currentState = State.IDLE;
 
+    final double KP = 0.02/3169;
+    final double KI = (1.0/3169)/100.0;
+    double integralSum=0;
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -84,6 +87,7 @@ public class OutreachAuto extends LinearOpMode {
 
 
 
+
         while (opModeIsActive() && !isStopRequested()) {
             switch (currentState) {
                 case MOVE_ARM:
@@ -137,9 +141,30 @@ public class OutreachAuto extends LinearOpMode {
             if(!Moby.arm.isBusy()){
                 Moby.arm.stopArm();
             }
+//            else{
+//                Moby.arm.setPower(getPIControlledArmPower());
+//            }
         }
 
 
+    }
+
+
+
+
+    public double getPIControlledArmPower(){
+
+
+        double error = Moby.arm.getTargetPosition()-Moby.arm.getTicks();
+        integralSum += error * Moby.arm.getTime();
+
+
+        Moby.arm.reset();
+
+        double output = error*KP + integralSum*KI;
+        if(output>1){output=1;}
+        if(output<-1){output=-1;}
+        return output;
     }
 
     public void top(){
