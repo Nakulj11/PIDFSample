@@ -1,16 +1,17 @@
 package org.firstinspires.ftc.teamcode.autonomous;
 
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+        import com.acmerobotics.roadrunner.geometry.Pose2d;
+        import com.acmerobotics.roadrunner.geometry.Vector2d;
+        import com.acmerobotics.roadrunner.trajectory.Trajectory;
+        import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+        import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+        import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+        import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.component.Arm;
-import org.firstinspires.ftc.teamcode.component.ClawAutoThread;
-import org.firstinspires.ftc.teamcode.core.Moby;
-import org.firstinspires.ftc.teamcode.drive.OdometryMecanumDrive;
+        import org.firstinspires.ftc.teamcode.component.Arm;
+        import org.firstinspires.ftc.teamcode.component.ClawAutoThread;
+        import org.firstinspires.ftc.teamcode.core.Moby;
+        import org.firstinspires.ftc.teamcode.drive.OdometryMecanumDrive;
 
 @Autonomous(name = "Outreach Auto", group = "competition")
 public class OutreachAuto extends LinearOpMode {
@@ -26,11 +27,14 @@ public class OutreachAuto extends LinearOpMode {
         IDLE
     }
 
-    State currentState = State.IDLE;
-
     final double KP = 0.02/3169;
     final double KI = (1.0/3169)/100.0;
     double integralSum=0;
+
+    State currentState = State.IDLE;
+
+    boolean armMove = true;
+
 
     @Override
     public void runOpMode() throws InterruptedException {
@@ -70,41 +74,35 @@ public class OutreachAuto extends LinearOpMode {
         Trajectory traj4 = drive.trajectoryBuilder(traj3.end())
                 .lineToLinearHeading(new Pose2d(0, 0, Math.toRadians(0))).build();
 
-
-
-
         waitForStart();
-
 
         if (isStopRequested()) return;
 
+        currentState = State.TRAJECTORY_1;
 
+        ElapsedTime time = new ElapsedTime();
+        time.reset();
+        armMove = true;
+        drive.followTrajectoryAsync(traj1);
 
-        currentState = State.MOVE_ARM;
-
-        Moby.arm.moveArm(Arm.TurnValueAuto.TOP);
-        sleep(1000);
-
-
-
+//        Moby.arm.moveArm(Arm.TurnValueAuto.TOP);
+//        sleep(1000); //?
 
         while (opModeIsActive() && !isStopRequested()) {
             switch (currentState) {
-                case MOVE_ARM:
-                    if(!Moby.arm.isBusy()){
-                        Moby.arm.stopArm();
-                        currentState = State.TRAJECTORY_1;
-                        drive.followTrajectoryAsync(traj1);
-                    }
-                    Moby.arm.moveArm(Arm.TurnValueAuto.TOP);
-                    break;
                 case TRAJECTORY_1:
                     if (!drive.isBusy()) {
                         outtake();
-                        Moby.arm.moveArm(Arm.TurnValueAuto.GROUND);
+
+                        drive.followTrajectoryAsync(traj2);
+                        time.reset();
+                        armMove = true;
                         Moby.intake.in();
                         currentState = State.TRAJECTORY_2;
-                        drive.followTrajectoryAsync(traj2);
+                    }
+                    if(time.milliseconds()>100&&armMove){
+                        Moby.arm.moveArm(Arm.TurnValueAuto.TOP);
+                        armMove=false;
                     }
                     break;
                 case TRAJECTORY_2:
@@ -114,19 +112,30 @@ public class OutreachAuto extends LinearOpMode {
                         Moby.arm.moveArm(Arm.TurnValueAuto.TOP);
                         currentState = State.TRAJECTORY_3;
                         drive.followTrajectoryAsync(traj3);
+
+                    }
+                    if(time.milliseconds()>1000&&armMove){
+                        Moby.arm.moveArm(Arm.TurnValueAuto.GROUND);
+                        armMove = false;
                     }
                     break;
                 case TRAJECTORY_3:
                     if (!drive.isBusy()) {
                         outtake();
-                        Moby.arm.moveArm(Arm.TurnValueAuto.GROUND);
+
                         currentState = State.TRAJECTORY_4;
                         drive.followTrajectoryAsync(traj4);
+                        armMove = true;
+                        time.reset();
                     }
                     break;
                 case TRAJECTORY_4:
                     if (!drive.isBusy()) {
                         currentState = State.IDLE;
+                    }
+                    if(time.milliseconds()>1000&&armMove){
+                        Moby.arm.moveArm(Arm.TurnValueAuto.GROUND);
+                        armMove = false;
                     }
                     break;
                 case IDLE:
@@ -141,16 +150,13 @@ public class OutreachAuto extends LinearOpMode {
             if(!Moby.arm.isBusy()){
                 Moby.arm.stopArm();
             }
-//            else{
+            //            else{
 //                Moby.arm.setPower(getPIControlledArmPower());
 //            }
         }
 
 
     }
-
-
-
 
     public double getPIControlledArmPower(){
 
