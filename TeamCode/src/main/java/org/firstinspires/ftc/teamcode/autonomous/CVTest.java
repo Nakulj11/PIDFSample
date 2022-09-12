@@ -33,6 +33,7 @@ public class CVTest extends LinearOpMode {
 
             if (location != null && tagOfInterest != null){
                 telemetry.addData("Location", location);
+                telemetry.addData("Tag ID", tagOfInterest.id);
                 telemetry.addLine("\n\nLocation data:");
                 tagToTelemetry(tagOfInterest);
                 telemetry.update();
