@@ -40,6 +40,8 @@ public class ImageDetectionPipeline extends OpenCvPipeline {
     public Mat processFrame(Mat input) {
         Imgproc.cvtColor(input, mat, Imgproc.COLOR_RGB2HSV);
 
+
+
         Scalar[] lowHSV = {new Scalar(12, 180, 130), //ONE
                 new Scalar(12, 180, 130),//TWO
                 new Scalar(12, 180, 130)};//THREE
