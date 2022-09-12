@@ -52,8 +52,9 @@ public class ImageDetectionPipeline extends OpenCvPipeline {
         Mat roi = null;
         //creats submatrices
         for(int i=0;i<3;i++){
-            Core.inRange(mat, lowHSV[i], highHSV[i], mat);
-            roi = mat.submat(DETECTION_ROI);
+            Mat mat2 = new Mat();
+            Core.inRange(mat, lowHSV[i], highHSV[i], mat2);
+            roi = mat2.submat(DETECTION_ROI);
             //finds the raw value that fits in HSV range
             values[i] = Core.sumElems(roi).val[0] / DETECTION_ROI.area() / 255;
         }
@@ -96,6 +97,10 @@ public class ImageDetectionPipeline extends OpenCvPipeline {
     //some methods to get constants and vars
     public Location getLocation() {
         return location;
+    }
+
+    public double[] getValues(){
+        return values;
     }
 
 }

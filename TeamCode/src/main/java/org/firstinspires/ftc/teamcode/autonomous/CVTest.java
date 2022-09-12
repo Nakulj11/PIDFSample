@@ -39,12 +39,17 @@ public class CVTest extends LinearOpMode {
             @Override
             public void onError(int errorCode) {
                 telemetry.addData("Camera Failed","");
+
                 telemetry.update();
             }
         });
 
         while (!isStarted() && !isStopRequested()) {
             telemetry.addData("Detected Location", pipeline.getLocation());
+            double[] values = pipeline.getValues();
+            for(int i=0;i<3;i++){
+                telemetry.addData("Side"+i+1+"Value: ", values[i]);
+            }
             telemetry.update();
         }
 
